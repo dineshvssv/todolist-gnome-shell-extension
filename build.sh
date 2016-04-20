@@ -1,4 +1,3 @@
-
 # Update locale
 echo "Build locale"
 cd ./locale
