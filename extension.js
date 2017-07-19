@@ -50,6 +50,7 @@ TodoList.prototype._init = function(){
 
 	// Tasks file
 	this.filePath = GLib.get_home_dir() + "/.list.tasks";
+	this.fp = GLib.get_home_dir() + "/.routines.tasks";
 	
 	// Locale
 	let locales = this.meta.path + "/locale";
@@ -127,6 +128,7 @@ TodoList.prototype._refresh = function(){
 	
 	// Check if tasks file exists
 	checkFile(this.filePath);
+	checkFile(this.fp);
 
 	// Add all tasks to ui
 	this.todosBox.destroy_all_children();
@@ -148,7 +150,23 @@ TodoList.prototype._refresh = function(){
 			tasks += 1;
 		}
 	}
-
+	content = Shell.get_file_contents_utf8_sync(this.fp);
+	lines = content.toString().split('\n');	
+	for (let i=0; i<lines.length; i++)
+	{
+		if (lines[i] != '' && lines[i] != '\n')
+		{
+			let item = new PopupMenu.PopupMenuItem(lines[i]);
+			let textClicked = lines[i];
+			item.connect('activate', Lang.bind(this,function(){
+				this.menu.close();
+				this.buttonText.set_text(_("(...)"));
+				removeTask(textClicked,this.filePath);
+			}));
+			this.todosBox.add(item.actor);
+			tasks += 1;
+		}
+	}
 	// Update status button
 	this.buttonText.set_text("(" + tasks + ")");
 
